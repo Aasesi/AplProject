@@ -14,11 +14,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Mikołaj\\Desktop\\test\\Aplproject\\Aplproject.csproj",
+      "projectUniqueName": "C:\\Users\\Mikołaj\\source\\repos\\AplProject\\Aplproject\\Aplproject.csproj",
       "projectName": "Aplproject",
-      "projectPath": "C:\\Users\\Mikołaj\\Desktop\\test\\Aplproject\\Aplproject.csproj",
+      "projectPath": "C:\\Users\\Mikołaj\\source\\repos\\AplProject\\Aplproject\\Aplproject.csproj",
       "packagesPath": "C:\\Users\\Mikołaj\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Mikołaj\\Desktop\\test\\Aplproject\\obj\\",
+      "outputPath": "C:\\Users\\Mikołaj\\source\\repos\\AplProject\\Aplproject\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
