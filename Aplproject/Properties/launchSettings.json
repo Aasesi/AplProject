@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Aplproject": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}
