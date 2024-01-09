@@ -1,8 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "l8n2edWIAL5+28leSUzHJKWrsGrVe0obLcBQcL1H6TDL4lrKmJFH4PRqa/waoPTPu1czjFeiem/NNKVbKuiutA==",
+  "dgSpecHash": "1xHkDbS1x2Fc76fOEWx6jXCaJEDwhfjAM0GTcSPVoSJSJvTf9lWkeFRoP2WmZwwSNBa5dvRJVUcoyqnb+pWy2A==",
   "success": true,
   "projectFilePath": "C:\\Users\\Mikołaj\\source\\repos\\AplProject\\Aplproject\\Aplproject.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "C:\\Users\\Mikołaj\\.nuget\\packages\\microsoft.win32.systemevents\\8.0.0\\microsoft.win32.systemevents.8.0.0.nupkg.sha512",
+    "C:\\Users\\Mikołaj\\.nuget\\packages\\system.drawing.common\\8.0.1\\system.drawing.common.8.0.1.nupkg.sha512"
+  ],
   "logs": []
 }

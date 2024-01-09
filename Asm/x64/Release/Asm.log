@@ -1,0 +1,4 @@
+﻿  Assembling Asmlibrary.asm...
+C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Microsoft.CppCommon.targets(1134,5): error MSB6006: Polecenie „link.exe” zakończone przez kod 1120.
+LINK : error LNK2001: nierozpoznany symbol zewnętrzny mainCRTStartup
+C:\Users\Mikołaj\source\repos\AplProject\Aplproject\x64\Release\Asm.exe : fatal error LNK1120: liczba nierozpoznanych elementów zewnętrznych: 1

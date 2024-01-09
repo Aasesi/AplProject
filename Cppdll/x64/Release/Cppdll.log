@@ -1,0 +1,6 @@
+﻿  pch.cpp
+  dllmain.cpp
+  .NETFramework,Version=v4.7.2.AssemblyAttributes.cpp
+     Trwa tworzenie biblioteki C:\Users\Mikołaj\source\repos\AplProject\Aplproject\\x64\Debug\Cppdll.lib i obiektu C:\Users\Mikołaj\source\repos\AplProject\Aplproject\\x64\Debug\Cppdll.exp
+  LINK : określono opcję /LTCG, lecz generowanie kodu nie było wymagane; usuń opcję /LTCG z wiersza polecenia konsolidatora w celu podwyższenia wydajności konsolidatora
+  Cppdll.vcxproj -> C:\Users\Mikołaj\source\repos\AplProject\Aplproject\x64\Debug\Cppdll.dll

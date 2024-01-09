@@ -46,6 +46,10 @@ C:\Users\Mikołaj\source\repos\AplProject\Aplproject\x64\Debug\Aplproject.deps.j
 C:\Users\Mikołaj\source\repos\AplProject\Aplproject\x64\Debug\Aplproject.runtimeconfig.json
 C:\Users\Mikołaj\source\repos\AplProject\Aplproject\x64\Debug\Aplproject.dll
 C:\Users\Mikołaj\source\repos\AplProject\Aplproject\x64\Debug\Aplproject.pdb
+C:\Users\Mikołaj\source\repos\AplProject\Aplproject\x64\Debug\Microsoft.Win32.SystemEvents.dll
+C:\Users\Mikołaj\source\repos\AplProject\Aplproject\x64\Debug\System.Drawing.Common.dll
+C:\Users\Mikołaj\source\repos\AplProject\Aplproject\x64\Debug\runtimes\win\lib\net6.0\Microsoft.Win32.SystemEvents.dll
+C:\Users\Mikołaj\source\repos\AplProject\Aplproject\obj\Debug\Aplproject.csproj.AssemblyReference.cache
 C:\Users\Mikołaj\source\repos\AplProject\Aplproject\obj\Debug\MainWindow.baml
 C:\Users\Mikołaj\source\repos\AplProject\Aplproject\obj\Debug\MainWindow.g.cs
 C:\Users\Mikołaj\source\repos\AplProject\Aplproject\obj\Debug\App.g.cs
@@ -55,6 +59,7 @@ C:\Users\Mikołaj\source\repos\AplProject\Aplproject\obj\Debug\Aplproject.Genera
 C:\Users\Mikołaj\source\repos\AplProject\Aplproject\obj\Debug\Aplproject.AssemblyInfoInputs.cache
 C:\Users\Mikołaj\source\repos\AplProject\Aplproject\obj\Debug\Aplproject.AssemblyInfo.cs
 C:\Users\Mikołaj\source\repos\AplProject\Aplproject\obj\Debug\Aplproject.csproj.CoreCompileInputs.cache
+C:\Users\Mikołaj\source\repos\AplProject\Aplproject\obj\Debug\Aplproject.csproj.CopyComplete
 C:\Users\Mikołaj\source\repos\AplProject\Aplproject\obj\Debug\Aplproject.dll
 C:\Users\Mikołaj\source\repos\AplProject\Aplproject\obj\Debug\refint\Aplproject.dll
 C:\Users\Mikołaj\source\repos\AplProject\Aplproject\obj\Debug\Aplproject.pdb

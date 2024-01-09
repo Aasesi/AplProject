@@ -1,0 +1,7 @@
+﻿  pch.cpp
+  binarizationcpp.cpp
+  dllmain.cpp
+  Generowanie kodu...
+  .NETFramework,Version=v4.7.2.AssemblyAttributes.cpp
+  binarizationcpp.obj : napotkano moduł MSIL; konsolidowanie przyrostowe jest wyłączone dla modułów MSIL; zostanie wykonana pełna konsolidacja
+  Cppdll.vcxproj -> C:\Users\Mikołaj\source\repos\AplProject\Aplproject\x64\Debug\Cppdll.dll

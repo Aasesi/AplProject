@@ -16,6 +16,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Drawing;
 
 unsafe public class AsmProxy
 {
@@ -28,6 +29,17 @@ unsafe public class AsmProxy
     }
 }
 
+public class CppProxy
+{
+    [DllImport("Cppdll.dll")]
+    private static extern int Add(int a, int b);
+
+    public int execute(int a, int b)
+    {
+        return Add(a, b);
+    }
+}
+
 
 namespace Aplproject
 {
@@ -36,11 +48,12 @@ namespace Aplproject
     /// </summary>
     public partial class MainWindow : Window
     {
-        private BitmapImage bitmap;
+        private BitmapImage bitmapImage;
+        private uint[] pixelData = new uint[] {};
         public MainWindow()
         {
             InitializeComponent();
-            bitmap = new BitmapImage();
+            bitmapImage = new BitmapImage();
         }
         private void loadImageButton_Click(object sender, RoutedEventArgs e)
         {
@@ -51,31 +64,68 @@ namespace Aplproject
             {
                 try
                 {
-                    bitmap.BeginInit();
-                    bitmap.UriSource = new Uri(openFileDialog.FileName);
-                    bitmap.CacheOption = BitmapCacheOption.OnLoad;
-                    bitmap.EndInit();
+                    string path = openFileDialog.FileName;
+                    bitmapImage.BeginInit();
+                    bitmapImage.UriSource = new Uri(path);
+                    bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+                    bitmapImage.EndInit();
 
-                    bitmap = convert_to_grayscale(bitmap);
-                    int stride = (bitmap.PixelWidth * bitmap.Format.BitsPerPixel + 7) / 8;
-                    byte[] pixelData = new byte[bitmap.PixelHeight * stride];
-                    bitmap.CopyPixels(pixelData, stride, 0);
-                    displayImage.Source = bitmap;
+                    displayImage.Source = bitmapImage;
 
-                    string filePath = "pixelData.txt";
+                    Bitmap pixelbitmap = new Bitmap(path);
 
-                    using (StreamWriter writer = new StreamWriter(filePath))
+                    int width = pixelbitmap.Width;
+                    int height = pixelbitmap.Height;
+
+                    pixelData = new uint[width * height * 3];
+
+
+                    int index = 0;
+                    for (int y = 0; y < height; y++)
                     {
-                        writer.WriteLine("Pixel Data:");
-                        writer.WriteLine(bitmap.Format.BitsPerPixel);
-                        
-
-                        for (int i = 0; i < pixelData.Length; i++)
+                        for (int x = 0; x < width; x++)
                         {
 
-                            writer.Write(pixelData[i] + " ");
+                            System.Drawing.Color pixelColor = pixelbitmap.GetPixel(x, y);
 
+
+
+                            uint red = pixelColor.R;
+                            uint green = pixelColor.G;
+                            uint blue = pixelColor.B;
+
+                            red = Math.Max(0, Math.Min(255, red));
+                            green = Math.Max(0, Math.Min(255, green));
+                            blue = Math.Max(0, Math.Min(255, blue));
+
+                            // Alternative
+                            //uint rgbValue = red * 1000000 + green * 1000 + blue;
+                            //pixelData[index++] = rgbValue;
+
+                            pixelData[index++] = red;
+                            pixelData[index++] = green;
+                            pixelData[index++] = blue;
                         }
+                    }
+                    string outputFilePath = "output_rgb_values.txt"; 
+
+                    try
+                    {
+                        using (StreamWriter writer = new StreamWriter(outputFilePath))
+                        {
+                            foreach (int rgbValue in pixelData)
+                            {
+                                writer.WriteLine(rgbValue);
+                            }
+                            CppProxy p = new CppProxy();
+                            int value = p.execute(1, 1111);
+                            writer.WriteLine(value);
+                        }
+                        Console.WriteLine("RGB values written to file: " + outputFilePath);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Error writing to file: " + ex.Message);
                     }
 
                 }
