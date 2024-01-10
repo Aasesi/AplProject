@@ -4,10 +4,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="MainWindow" Height="800" Width="1150">
     <Grid>
-        <Button x:Name="loadImageButton" Content="Load Image" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="903,59,0,0" Click="loadImageButton_Click"/>
-        <Button x:Name="Asembly" Content="Asm function" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="903,96,0,0" Click="asmButton_Click"/>
-        <Button x:Name="C" Content="c++ function" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="903,134,0,0" Click="cButton_Click"/>
-        <ScrollViewer Margin="633,347,32,77" RenderTransformOrigin="0.5,0.5">
+        <Button x:Name="loadImageButton" Content="Load Image" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="908,38,0,0" Click="loadImageButton_Click"/>
+        <Button x:Name="Run" Content="Run functions" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="892,261,0,0" Click="runButton_Click"/>
+        <ScrollViewer Margin="28,30,645,403" RenderTransformOrigin="0.5,0.5">
             <ScrollViewer.RenderTransform>
                 <TransformGroup>
                     <ScaleTransform/>
@@ -18,7 +17,23 @@
             </ScrollViewer.RenderTransform>
             <Image x:Name="displayImage" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="Uniform"/>
         </ScrollViewer>
-        <CheckBox Content="Enable Function 1" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="903,172,0,0" x:Name="enableFunctionCheckBox" />
-        <CheckBox Content="Enable Function 2" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="1003,172,0,0" x:Name="enableFunctionCheckBox2" />
+        <CheckBox Content="Enable Asm function" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="807,85,0,0" x:Name="asmFunctionCheckbox" />
+        <CheckBox Content="Enable C++ function" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="975,85,0,0" x:Name="cppFunctionCheckbox" />
+        <Label Content="Number of consecutive runs:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="860,121,0,0"/>
+        <Label Content="Enter threshold:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="884,179,0,0"/>
+        <TextBox Name="RunTextBox" HorizontalAlignment="Left" VerticalAlignment="Top" PreviewTextInput="RunsTextBoxinput" Margin="888,152,0,0" Width="86" Height="22" TextChanged="RunTextBoxChanged"/>
+        <TextBox Name="ThesholdTextBox" HorizontalAlignment="Left" VerticalAlignment="Top" PreviewTextInput="ThresholdTextbox" Margin="888,205,0,0" Width="86" Height="22" TextChanged="ThresholdChanged"/>
+        <ScrollViewer Margin="28,421,645,12" RenderTransformOrigin="0.5,0.5">
+            <ScrollViewer.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform/>
+                    <SkewTransform/>
+                    <RotateTransform Angle="-0.271"/>
+                    <TranslateTransform/>
+                </TransformGroup>
+            </ScrollViewer.RenderTransform>
+            <Image x:Name="binarizedImage" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="Uniform"/>
+        </ScrollViewer>
+        <Label Content="Statistics:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="813,338,0,0"/>
     </Grid>
 </Window>

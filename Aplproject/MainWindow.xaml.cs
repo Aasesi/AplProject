@@ -18,6 +18,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Text.RegularExpressions;
 
 unsafe public class AsmProxy
 {
@@ -50,11 +51,16 @@ namespace Aplproject
     public partial class MainWindow : Window
     {
         private BitmapImage bitmapImage;
+        private BitmapImage binarizationImage;
         private int[] pixelData = new int[] {};
+        private int runsNumber = 1;
+        private int threshold = 0;
+        private string path = "";
         public MainWindow()
         {
             InitializeComponent();
             bitmapImage = new BitmapImage();
+            binarizationImage = new BitmapImage();
         }
         unsafe private void loadImageButton_Click(object sender, RoutedEventArgs e)
         {
@@ -65,90 +71,13 @@ namespace Aplproject
             {
                 try
                 {
-                    string path = openFileDialog.FileName;
+                    path = openFileDialog.FileName;
                     bitmapImage.BeginInit();
                     bitmapImage.UriSource = new Uri(path);
                     bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
                     bitmapImage.EndInit();
 
                     displayImage.Source = bitmapImage;
-
-                    Bitmap pixelbitmap = new Bitmap(path);
-
-                    int width = pixelbitmap.Width;
-                    int height = pixelbitmap.Height;
-
-                    pixelData = new int[width * height * 3];
-
-
-                    int index = 0;
-                    for (int y = 0; y < height; y++)
-                    {
-                        for (int x = 0; x < width; x++)
-                        {
-
-                            System.Drawing.Color pixelColor = pixelbitmap.GetPixel(x, y);
-
-
-
-                            int red = pixelColor.R;
-                            int green = pixelColor.G;
-                            int blue = pixelColor.B;
-
-                            red = Math.Max(0, Math.Min(255, red));
-                            green = Math.Max(0, Math.Min(255, green));
-                            blue = Math.Max(0, Math.Min(255, blue));
-
-                            // Alternative
-                            //int rgbValue = red * 1000000 + green * 1000 + blue;
-                            //pixelData[index++] = rgbValue;
-
-                            pixelData[index++] = red;
-                            pixelData[index++] = green;
-                            pixelData[index++] = blue;
-                        }
-                    }
-                    CppProxy proxy = new CppProxy();
-                    int size = (int)(width * height * 3);
-                    IntPtr binarized_array = proxy.execute(pixelData, size, 80);
-                    Marshal.Copy(binarized_array, pixelData, 0, size);
-
-                    Bitmap bmp = new Bitmap(width, height);
-
-                    int ind = 0;
-                    for (int y = 0; y < height; y++)
-                    {
-                        for (int x = 0; x < width; x++)
-                        {
-                            System.Drawing.Color pixelColor = System.Drawing.Color.FromArgb(pixelData[ind], pixelData[ind + 1], pixelData[ind + 2]);
-                            bmp.SetPixel(x, y, pixelColor);
-                            ind += 3; 
-                        }
-                    }
-                    bmp.Save("output_image.png", System.Drawing.Imaging.ImageFormat.Png);
-
-                    //string outputFilePath = "output_rgb_values.txt"; 
-
-                    //try
-                    //{
-                    //    using (StreamWriter writer = new StreamWriter(outputFilePath))
-                    //    {
-                    //        foreach (int rgbValue in pixelData)
-                    //        {
-                    //            writer.WriteLine(rgbValue);
-                    //        }
-                    //    }
-                    //    Console.WriteLine("RGB values written to file: " + outputFilePath);
-                    //}
-                    //catch (Exception ex)
-                    //{
-                    //    Console.WriteLine("Error writing to file: " + ex.Message);
-                    //}
-
-
-
-                    // Free array
-                    Marshal.FreeHGlobal(binarized_array);
 
                 }
                 catch (Exception ex)
@@ -158,13 +87,133 @@ namespace Aplproject
             }
 
         }
-        private void cButton_Click(object sender, RoutedEventArgs e)
+
+        private void runButton_Click(object sender, RoutedEventArgs e)
         {
+            Bitmap pixelbitmap = new Bitmap(path);
+
+            int width = pixelbitmap.Width;
+            int height = pixelbitmap.Height;
+
+            pixelData = new int[width * height * 3];
+
+            int index = 0;
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    System.Drawing.Color pixelColor = pixelbitmap.GetPixel(x, y);
+
+                    int red = pixelColor.R;
+                    int green = pixelColor.G;
+                    int blue = pixelColor.B;
+
+                    red = Math.Max(0, Math.Min(255, red));
+                    green = Math.Max(0, Math.Min(255, green));
+                    blue = Math.Max(0, Math.Min(255, blue));
+
+                    pixelData[index++] = red;
+                    pixelData[index++] = green;
+                    pixelData[index++] = blue;
+                }
+            }
+
+            CppProxy proxy = new CppProxy();
+            int size = (int)(width * height * 3);
+            IntPtr binarized_array = proxy.execute(pixelData, size, 80);
+
+
+            if(asmFunctionCheckbox.IsChecked == true)
+            {
+
+            }
+
+            if(cppFunctionCheckbox.IsChecked == true)
+            {
+                for (int i = 0; i < runsNumber; i++)
+                {
+                    binarized_array = proxy.execute(pixelData, size, 80);
+                }
+            }
+            Marshal.Copy(binarized_array, pixelData, 0, size);
+            Bitmap bmp = new Bitmap(width, height);
+
+            int ind = 0;
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    System.Drawing.Color pixelColor = System.Drawing.Color.FromArgb(pixelData[ind], pixelData[ind + 1], pixelData[ind + 2]);
+                    bmp.SetPixel(x, y, pixelColor);
+                    ind += 3;
+                }
+            }
+            bmp.Save("output_image.png", System.Drawing.Imaging.ImageFormat.Png);
+            string imagePath = System.IO.Directory.GetCurrentDirectory();
+            Marshal.FreeHGlobal(binarized_array);
+
+
+            binarizationImage.BeginInit();
+            binarizationImage.UriSource = new Uri(imagePath + "/output_image.png");
+            binarizationImage.CacheOption = BitmapCacheOption.OnLoad;
+            binarizationImage.EndInit();
+
+            binarizedImage.Source = binarizationImage;
+        }
+
+        private void RunsTextBoxinput(object sender, System.Windows.Input.TextCompositionEventArgs e)
+        {
+            Regex regex = new Regex("[^0-9]+");
+            e.Handled = regex.IsMatch(e.Text);
+        }
+
+        private void RunTextBoxChanged(object sender, TextChangedEventArgs e)
+        {
+            if (int.TryParse(RunTextBox.Text, out int value))
+            {
+                if (value < 0 || value > 255)
+                {
+                    MessageBox.Show("Value must be between 0 and 255");
+                    RunTextBox.Text = "0";
+                }
+                else
+                {
+                    runsNumber = value;
+                }
+            }
+            else if (RunTextBox.Text != "-")
+            {
+                MessageBox.Show("Please enter a valid numeric value");
+                RunTextBox.Text = "0";
+            }
+        }
+
+        private void ThresholdTextbox(object sender, System.Windows.Input.TextCompositionEventArgs e)
+        {
+            Regex regex = new Regex("[^0-9]+");
+            e.Handled = regex.IsMatch(e.Text);
 
         }
-        private void asmButton_Click(object sender, RoutedEventArgs e)
-        {
 
+        private void ThresholdChanged(object sender, TextChangedEventArgs e)
+        {
+            if (int.TryParse(RunTextBox.Text, out int value))
+            {
+                if (value < 1)
+                {
+                    MessageBox.Show("Value must be above 1");
+                    RunTextBox.Text = "1";
+                }
+                else
+                {
+                    threshold = value;
+                }
+            }
+            else if (RunTextBox.Text != "-")
+            {
+                MessageBox.Show("Please enter a valid numeric value");
+                RunTextBox.Text = "1";
+            }
         }
 
         private BitmapImage convert_to_grayscale(BitmapImage bitmap)
