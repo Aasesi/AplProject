@@ -17,6 +17,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Drawing;
+using System.Drawing.Imaging;
 
 unsafe public class AsmProxy
 {
@@ -29,14 +30,14 @@ unsafe public class AsmProxy
     }
 }
 
-public class CppProxy
+unsafe public class CppProxy
 {
     [DllImport("Cppdll.dll")]
-    private static extern int Add(int a, int b);
+    private static extern IntPtr Add(int[] arr, int size, int threshold);
 
-    public int execute(int a, int b)
+    public IntPtr execute(int[] arr, int size, int threshold)
     {
-        return Add(a, b);
+        return Add(arr, size, threshold);
     }
 }
 
@@ -49,13 +50,13 @@ namespace Aplproject
     public partial class MainWindow : Window
     {
         private BitmapImage bitmapImage;
-        private uint[] pixelData = new uint[] {};
+        private int[] pixelData = new int[] {};
         public MainWindow()
         {
             InitializeComponent();
             bitmapImage = new BitmapImage();
         }
-        private void loadImageButton_Click(object sender, RoutedEventArgs e)
+        unsafe private void loadImageButton_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Filter = "Image Files (*.jpg; *.jpeg; *.png; *.gif; *.bmp)|*.jpg; *.jpeg; *.png; *.gif; *.bmp|All files (*.*)|*.*";
@@ -77,7 +78,7 @@ namespace Aplproject
                     int width = pixelbitmap.Width;
                     int height = pixelbitmap.Height;
 
-                    pixelData = new uint[width * height * 3];
+                    pixelData = new int[width * height * 3];
 
 
                     int index = 0;
@@ -90,16 +91,16 @@ namespace Aplproject
 
 
 
-                            uint red = pixelColor.R;
-                            uint green = pixelColor.G;
-                            uint blue = pixelColor.B;
+                            int red = pixelColor.R;
+                            int green = pixelColor.G;
+                            int blue = pixelColor.B;
 
                             red = Math.Max(0, Math.Min(255, red));
                             green = Math.Max(0, Math.Min(255, green));
                             blue = Math.Max(0, Math.Min(255, blue));
 
                             // Alternative
-                            //uint rgbValue = red * 1000000 + green * 1000 + blue;
+                            //int rgbValue = red * 1000000 + green * 1000 + blue;
                             //pixelData[index++] = rgbValue;
 
                             pixelData[index++] = red;
@@ -107,26 +108,47 @@ namespace Aplproject
                             pixelData[index++] = blue;
                         }
                     }
-                    string outputFilePath = "output_rgb_values.txt"; 
+                    CppProxy proxy = new CppProxy();
+                    int size = (int)(width * height * 3);
+                    IntPtr binarized_array = proxy.execute(pixelData, size, 80);
+                    Marshal.Copy(binarized_array, pixelData, 0, size);
 
-                    try
+                    Bitmap bmp = new Bitmap(width, height);
+
+                    int ind = 0;
+                    for (int y = 0; y < height; y++)
                     {
-                        using (StreamWriter writer = new StreamWriter(outputFilePath))
+                        for (int x = 0; x < width; x++)
                         {
-                            foreach (int rgbValue in pixelData)
-                            {
-                                writer.WriteLine(rgbValue);
-                            }
-                            CppProxy p = new CppProxy();
-                            int value = p.execute(1, 1111);
-                            writer.WriteLine(value);
+                            System.Drawing.Color pixelColor = System.Drawing.Color.FromArgb(pixelData[ind], pixelData[ind + 1], pixelData[ind + 2]);
+                            bmp.SetPixel(x, y, pixelColor);
+                            ind += 3; 
                         }
-                        Console.WriteLine("RGB values written to file: " + outputFilePath);
                     }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine("Error writing to file: " + ex.Message);
-                    }
+                    bmp.Save("output_image.png", System.Drawing.Imaging.ImageFormat.Png);
+
+                    //string outputFilePath = "output_rgb_values.txt"; 
+
+                    //try
+                    //{
+                    //    using (StreamWriter writer = new StreamWriter(outputFilePath))
+                    //    {
+                    //        foreach (int rgbValue in pixelData)
+                    //        {
+                    //            writer.WriteLine(rgbValue);
+                    //        }
+                    //    }
+                    //    Console.WriteLine("RGB values written to file: " + outputFilePath);
+                    //}
+                    //catch (Exception ex)
+                    //{
+                    //    Console.WriteLine("Error writing to file: " + ex.Message);
+                    //}
+
+
+
+                    // Free array
+                    Marshal.FreeHGlobal(binarized_array);
 
                 }
                 catch (Exception ex)

@@ -7,7 +7,7 @@
         <Button x:Name="loadImageButton" Content="Load Image" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="903,59,0,0" Click="loadImageButton_Click"/>
         <Button x:Name="Asembly" Content="Asm function" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="903,96,0,0" Click="asmButton_Click"/>
         <Button x:Name="C" Content="c++ function" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="903,134,0,0" Click="cButton_Click"/>
-        <ScrollViewer Margin="86,138,579,286" RenderTransformOrigin="0.5,0.5">
+        <ScrollViewer Margin="633,347,32,77" RenderTransformOrigin="0.5,0.5">
             <ScrollViewer.RenderTransform>
                 <TransformGroup>
                     <ScaleTransform/>
