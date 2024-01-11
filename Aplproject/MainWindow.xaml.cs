@@ -18,6 +18,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Diagnostics;
 using System.Text.RegularExpressions;
 
 unsafe public class AsmProxy
@@ -54,7 +55,7 @@ namespace Aplproject
         private BitmapImage binarizationImage;
         private int[] pixelData = new int[] {};
         private int runsNumber = 1;
-        private int threshold = 0;
+        private int threshold = 150;
         private string path = "";
         public MainWindow()
         {
@@ -72,6 +73,7 @@ namespace Aplproject
                 try
                 {
                     path = openFileDialog.FileName;
+                    bitmapImage = new BitmapImage();
                     bitmapImage.BeginInit();
                     bitmapImage.UriSource = new Uri(path);
                     bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
@@ -120,7 +122,8 @@ namespace Aplproject
 
             CppProxy proxy = new CppProxy();
             int size = (int)(width * height * 3);
-            IntPtr binarized_array = proxy.execute(pixelData, size, 80);
+            IntPtr binarized_array = proxy.execute(pixelData, size, threshold);
+
 
 
             if(asmFunctionCheckbox.IsChecked == true)
@@ -128,12 +131,43 @@ namespace Aplproject
 
             }
 
+
+            // Można dorobic jakis graph
+            double[] time_of_execution_entire_func = new double[runsNumber];
+
             if(cppFunctionCheckbox.IsChecked == true)
             {
+                Stopwatch sw2 = new Stopwatch();
+
                 for (int i = 0; i < runsNumber; i++)
                 {
-                    binarized_array = proxy.execute(pixelData, size, 80);
+                    sw2.Start();
+                    binarized_array = proxy.execute(pixelData, size, threshold);
+                    sw2.Stop();
+                    TimeSpan elapsed = sw2.Elapsed;
+                    time_of_execution_entire_func[i] = elapsed.TotalMilliseconds;
                 }
+
+                double sum = 0;
+                double average = 0;
+                double best_time = time_of_execution_entire_func[1];
+                double worst_time = time_of_execution_entire_func[1];
+                for(int i = 1; i<runsNumber;i++)
+                {
+                    sum += time_of_execution_entire_func[i];
+                    if (time_of_execution_entire_func[i] < best_time)
+                    {
+                        best_time = time_of_execution_entire_func[i];
+                    }
+                    if (time_of_execution_entire_func[i] > worst_time)
+                    {
+                        worst_time = time_of_execution_entire_func[i];
+                    }
+                }
+                average = sum / (runsNumber - 1);
+
+                string statistics = $"C++ Function:\nAverage = {average}\nBest time = {best_time}\nWorst time = {worst_time}";
+                StatisticsTextblock.Text = statistics; 
             }
             Marshal.Copy(binarized_array, pixelData, 0, size);
             Bitmap bmp = new Bitmap(width, height);
@@ -152,7 +186,7 @@ namespace Aplproject
             string imagePath = System.IO.Directory.GetCurrentDirectory();
             Marshal.FreeHGlobal(binarized_array);
 
-
+            binarizationImage = new BitmapImage();
             binarizationImage.BeginInit();
             binarizationImage.UriSource = new Uri(imagePath + "/output_image.png");
             binarizationImage.CacheOption = BitmapCacheOption.OnLoad;
@@ -165,54 +199,37 @@ namespace Aplproject
         {
             Regex regex = new Regex("[^0-9]+");
             e.Handled = regex.IsMatch(e.Text);
-        }
 
-        private void RunTextBoxChanged(object sender, TextChangedEventArgs e)
+        }
+        private void RunBoxLostFocus(object sender, RoutedEventArgs e)
         {
-            if (int.TryParse(RunTextBox.Text, out int value))
+            int val = int.Parse(RunTextBox.Text);
+            if(val < 1)
             {
-                if (value < 0 || value > 255)
-                {
-                    MessageBox.Show("Value must be between 0 and 255");
-                    RunTextBox.Text = "0";
-                }
-                else
-                {
-                    runsNumber = value;
-                }
+                MessageBox.Show("Value must be above 1");
+                RunTextBox.Text = "1";
             }
-            else if (RunTextBox.Text != "-")
+            else
             {
-                MessageBox.Show("Please enter a valid numeric value");
-                RunTextBox.Text = "0";
+                runsNumber = val;
             }
         }
-
         private void ThresholdTextbox(object sender, System.Windows.Input.TextCompositionEventArgs e)
         {
             Regex regex = new Regex("[^0-9]+");
             e.Handled = regex.IsMatch(e.Text);
-
         }
-
-        private void ThresholdChanged(object sender, TextChangedEventArgs e)
+        private void ThresholdBoxLostFocus(object sender, RoutedEventArgs e)
         {
-            if (int.TryParse(RunTextBox.Text, out int value))
+            int val = int.Parse(ThresholdTextBox.Text);
+            if (val > 255)
             {
-                if (value < 1)
-                {
-                    MessageBox.Show("Value must be above 1");
-                    RunTextBox.Text = "1";
-                }
-                else
-                {
-                    threshold = value;
-                }
+                MessageBox.Show("Value must be between 0 and 255");
+                ThresholdTextBox.Text = "255";
             }
-            else if (RunTextBox.Text != "-")
+            else
             {
-                MessageBox.Show("Please enter a valid numeric value");
-                RunTextBox.Text = "1";
+                threshold = val;
             }
         }
 
