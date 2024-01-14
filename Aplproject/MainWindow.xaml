@@ -38,6 +38,6 @@
         <ProgressBar Name="progressBar" HorizontalAlignment="Left" VerticalAlignment="Top" Height="20" Margin="695,300,0,0" Width="181"/>
         <Label Content="Original Image:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="27,0,0,0"/>
         <Label Content="Binarized Image:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="27,392,0,0"/>
-        <TextBlock x:Name="StatisticsTextblock" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="18" Margin="575,494,0,0" Width="173" Height="114"/>
+        <TextBlock x:Name="StatisticsTextblock" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="13" Margin="575,494,0,0" Width="243" Height="239"/>
     </Grid>
 </Window>

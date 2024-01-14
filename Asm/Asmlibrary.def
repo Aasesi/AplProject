@@ -1,4 +1,3 @@
 LIBRARY "Asm"
 EXPORTS
-
-asmAddTwoDoubles
+ProcAsm2

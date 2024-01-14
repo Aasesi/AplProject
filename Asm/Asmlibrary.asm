@@ -1,7 +1,13 @@
 .data
 .code
-asmAddTwoDoubles proc
-	vaddpd ymm0, ymm0, ymm1
-	ret
-asmAddTwoDoubles endp
+ProcAsm2 proc
+xor rax,rax
+mov rax, rdx 
+mov dl,4 
+mul dl 
+ 
+mov eax, [rcx+rax]
+ 
+ret
+ProcAsm2 endp
 end

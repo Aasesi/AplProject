@@ -20,16 +20,18 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
+using System.Security.Policy;
 
 unsafe public class AsmProxy
 {
     [DllImport("Asm.dll")]
-    private static extern double asmAddTwoDoubles(double a, double b);
+    private static unsafe extern int ProcAsm2(int* a, int pos);
 
-    public double executeAsmAddTwoDoubles(double a, double b)
+    public int executeAsmAddTwoDoubles(int* a, int pos)
     {
-        return asmAddTwoDoubles(a, b);
+        return ProcAsm2(a, pos);
     }
+
 }
 
 unsafe public class CppProxy
@@ -54,6 +56,9 @@ namespace Aplproject
         private BitmapImage bitmapImage;
         private BitmapImage binarizationImage;
         private int[] pixelData = new int[] {};
+        private int[] redData = new int[] {};
+        private int[] greenData = new int[] {};
+        private int[] blueData = new int[] {};
         private int runsNumber = 1;
         private int threshold = 150;
         private string path = "";
@@ -80,6 +85,7 @@ namespace Aplproject
                     bitmapImage.EndInit();
 
                     displayImage.Source = bitmapImage;
+                    binarizedImage.Source = null;
 
                 }
                 catch (Exception ex)
@@ -90,7 +96,37 @@ namespace Aplproject
 
         }
 
-        private void runButton_Click(object sender, RoutedEventArgs e)
+        private double[] getCppResults(int size)
+        {
+            CppProxy proxy = new CppProxy();
+            Stopwatch sw2 = new Stopwatch();
+            double[] time_of_execution_entire_func = new double[runsNumber];
+            for (int i = 0; i < runsNumber; i++)
+            {
+                IntPtr binarized_array;
+
+                sw2.Start();
+                binarized_array = proxy.execute(pixelData, size, threshold);
+                sw2.Stop();
+                TimeSpan elapsed = sw2.Elapsed;
+                time_of_execution_entire_func[i] = elapsed.TotalMilliseconds;
+                sw2.Reset();
+                Marshal.FreeHGlobal(binarized_array);
+            }
+            return time_of_execution_entire_func; 
+        }
+
+        //private async void executeFunctions()
+        //{
+            
+        //    if(asmFunctionCheckbox.IsChecked == true || cppFunctionCheckbox.IsChecked== true)
+        //    {
+
+        //    }
+        //}
+
+        // Trzeba sprawdzic najpierw czy image jest empty.
+        unsafe private void runButton_Click(object sender, RoutedEventArgs e)
         {
             Bitmap pixelbitmap = new Bitmap(path);
 
@@ -117,6 +153,10 @@ namespace Aplproject
                     pixelData[index++] = red;
                     pixelData[index++] = green;
                     pixelData[index++] = blue;
+
+
+                    // Dodatkowy kod dla osobnych tablic
+
                 }
             }
 
@@ -128,7 +168,15 @@ namespace Aplproject
 
             if(asmFunctionCheckbox.IsChecked == true)
             {
-
+                int[] n1Array = { 1, 2, 3, 4, 5, 6 };
+                unsafe
+                {
+                    fixed (int* aAddress = &n1Array[0])
+                    {
+                        AsmProxy asmm = new AsmProxy();
+                        int c = asmm.executeAsmAddTwoDoubles(aAddress, 4);
+                    }
+                }
             }
 
 
@@ -146,6 +194,7 @@ namespace Aplproject
                     sw2.Stop();
                     TimeSpan elapsed = sw2.Elapsed;
                     time_of_execution_entire_func[i] = elapsed.TotalMilliseconds;
+                    sw2.Reset();
                 }
 
                 double sum = 0;
@@ -184,15 +233,21 @@ namespace Aplproject
             }
             bmp.Save("output_image.png", System.Drawing.Imaging.ImageFormat.Png);
             string imagePath = System.IO.Directory.GetCurrentDirectory();
+
             Marshal.FreeHGlobal(binarized_array);
 
             binarizationImage = new BitmapImage();
-            binarizationImage.BeginInit();
-            binarizationImage.UriSource = new Uri(imagePath + "/output_image.png");
-            binarizationImage.CacheOption = BitmapCacheOption.OnLoad;
-            binarizationImage.EndInit();
 
-            binarizedImage.Source = binarizationImage;
+            using (MemoryStream memoryStream = new MemoryStream())
+            {
+                bmp.Save(memoryStream, ImageFormat.Png);
+                memoryStream.Position = 0;
+                binarizationImage.BeginInit();
+                binarizationImage.StreamSource = memoryStream;
+                binarizationImage.CacheOption = BitmapCacheOption.OnLoad;
+                binarizationImage.EndInit();
+            }
+                binarizedImage.Source = binarizationImage;
         }
 
         private void RunsTextBoxinput(object sender, System.Windows.Input.TextCompositionEventArgs e)
@@ -203,6 +258,10 @@ namespace Aplproject
         }
         private void RunBoxLostFocus(object sender, RoutedEventArgs e)
         {
+            if(string.IsNullOrEmpty(RunTextBox.Text))
+            {
+                RunTextBox.Text = "1";
+            }
             int val = int.Parse(RunTextBox.Text);
             if(val < 1)
             {
@@ -221,6 +280,10 @@ namespace Aplproject
         }
         private void ThresholdBoxLostFocus(object sender, RoutedEventArgs e)
         {
+            if (string.IsNullOrEmpty(ThresholdTextBox.Text))
+            {
+                ThresholdTextBox.Text = "0";
+            }
             int val = int.Parse(ThresholdTextBox.Text);
             if (val > 255)
             {
