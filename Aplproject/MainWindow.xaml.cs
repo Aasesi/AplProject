@@ -22,14 +22,25 @@ using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Security.Policy;
 
+
+public unsafe struct StructToAssembler 
+{
+    public int* ptrA1;  //
+    public int* ptrA2;
+    public int* ptrA3;
+    public int* ptrA4;
+    public int* ptrA5;
+    public int len;
+}
+
 unsafe public class AsmProxy
 {
     [DllImport("Asm.dll")]
-    private static unsafe extern int ProcAsm2(int* a, int pos);
+    private static unsafe extern int ProcAsm3(StructToAssembler* structurePtr);
 
-    public int executeAsmAddTwoDoubles(int* a, int pos)
+    public int executeAsmAddTwoDoubles(StructToAssembler* structurePtr)
     {
-        return ProcAsm2(a, pos);
+        return ProcAsm3(structurePtr);
     }
 
 }
@@ -53,12 +64,14 @@ namespace Aplproject
     /// </summary>
     public partial class MainWindow : Window
     {
+        public static StructToAssembler struktura = new StructToAssembler();
         private BitmapImage bitmapImage;
         private BitmapImage binarizationImage;
         private int[] pixelData = new int[] {};
         private int[] redData = new int[] {};
         private int[] greenData = new int[] {};
         private int[] blueData = new int[] {};
+        private int[] resultData = new int[] {};
         private int runsNumber = 1;
         private int threshold = 150;
         private string path = "";
@@ -134,8 +147,12 @@ namespace Aplproject
             int height = pixelbitmap.Height;
 
             pixelData = new int[width * height * 3];
+            redData = new int[width * height];
+            greenData = new int[width * height];
+            blueData = new int[width * height];
 
             int index = 0;
+            int index2 = 0;
             for (int y = 0; y < height; y++)
             {
                 for (int x = 0; x < width; x++)
@@ -154,8 +171,11 @@ namespace Aplproject
                     pixelData[index++] = green;
                     pixelData[index++] = blue;
 
+                    redData[index2] = red;
+                    greenData[index2] = green;
+                    blueData[index2] = blue;
 
-                    // Dodatkowy kod dla osobnych tablic
+                    index2++;
 
                 }
             }
@@ -164,18 +184,31 @@ namespace Aplproject
             int size = (int)(width * height * 3);
             IntPtr binarized_array = proxy.execute(pixelData, size, threshold);
 
-
-
-            if(asmFunctionCheckbox.IsChecked == true)
+            long[] a1 = { 10, 4, 6, 8, 10, 12};
+            long[] a2 = {150, 150, 150, 150, 150, 150};
+            int[] a3 = {1, 2, 3, 4, 5, 1, 2, 8};
+            int[] threshtable = { 150, 150, 150, 150 };
+            int[] resultData = new int[width * height];
+            int sss = redData[0];
+            int ssq = redData[1];
+            int ssr = redData[2];
+            int ssg = redData[3];
+            int num = width * height;
+            unsafe
             {
-                int[] n1Array = { 1, 2, 3, 4, 5, 6 };
-                unsafe
+                fixed (StructToAssembler* aAddress = &struktura)
                 {
-                    fixed (int* aAddress = &n1Array[0])
+                    fixed (int* ptr1 = redData, ptr2 = greenData, ptr3 = blueData, ptr4=resultData, ptr5= threshtable)
                     {
+                        struktura.ptrA1 = ptr1;
+                        struktura.ptrA2 = ptr2;
+                        struktura.ptrA3 = ptr3;
+                        struktura.ptrA4 = ptr4;
+                        struktura.ptrA5 = ptr5;
+                        struktura.len = width * height;
                         AsmProxy asmm = new AsmProxy();
-                        int c = asmm.executeAsmAddTwoDoubles(aAddress, 4);
-                    }
+                        int c = asmm.executeAsmAddTwoDoubles(aAddress); //Wywołaj funkcję
+                    };
                 }
             }
 
@@ -226,9 +259,9 @@ namespace Aplproject
             {
                 for (int x = 0; x < width; x++)
                 {
-                    System.Drawing.Color pixelColor = System.Drawing.Color.FromArgb(pixelData[ind], pixelData[ind + 1], pixelData[ind + 2]);
+                    System.Drawing.Color pixelColor = System.Drawing.Color.FromArgb(resultData[ind], resultData[ind], resultData[ind]);
                     bmp.SetPixel(x, y, pixelColor);
-                    ind += 3;
+                    ind += 1;
                 }
             }
             bmp.Save("output_image.png", System.Drawing.Imaging.ImageFormat.Png);
