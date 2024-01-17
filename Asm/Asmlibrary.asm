@@ -1,3 +1,23 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Project Title: Image Binarization
+; Description  : This algorithm is designed for the process of converting pixels
+;                data from an image into binary image with main goal to separate
+;                foreground from background. The process involves determining whether
+;                each pixel should be classified as white or black based on individual
+;                RGB channel values.
+;
+; 
+; Implementation Date: 15.01.2024
+; Semester/Academic Year: Semester 5, Winter 2023/2024
+; Author: Miko≥aj WilczyÒski, Konrad Kie≥tyka, Weronika èeraÒska
+; 
+; Version: 1.0
+; 
+; 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+
 .data
 red dq  0
 green dq  0
@@ -9,7 +29,7 @@ len dq  0
 
  
 .code
-ProcAsm3 proc
+AsmBinarize proc
 mov rax,rcx
 
 mov rbx, [rcx]			; Load first elment of the struct - red array
@@ -79,20 +99,20 @@ movups [rsi + r8], xmm1 ; Copy results to result array
 jmp @Assign_binary_values	; Assign correct values for pixels
 
 
-
+; Assign black or white pixels
 @Assign_binary_values:
 mov rsi, result			; Load result pointer to rsi
 mov eax, [rsi + r10]	; Load n-th array element to eax
 cmp eax, 4294967295		; Compare with 0xFFFFFFFF
-je @equal_case
-jmp @not_equal
+je @equal_case			; Jump to equal case
+jmp @not_equal			
 
 
 @equal_case:
 mov ebx, 0
-mov [rsi + r10], ebx	;Assign 0
-add r10, 4
-add r12, 1
+mov [rsi + r10], ebx	; Assign 0
+add r10, 4				; Increment array by one int
+add r12, 1				; Increment loop counter by 1
 cmp r12, 4				; Compare with the loop iteration 
 jl @Assign_binary_values
 jmp @increment_loop
@@ -101,9 +121,9 @@ jmp @increment_loop
 @not_equal:
 mov ebx, 255
 mov [rsi + r10], ebx			; Assign 255
-add r10, 4
-add r12, 1
-cmp r12, 4
+add r10, 4						; Increment array by one int
+add r12, 1						; Increment loop counter by 1
+cmp r12, 4						; Compare with the loop iteration
 jl @Assign_binary_values
 jmp @increment_loop
 
@@ -114,12 +134,12 @@ add r8, 16			; Get next four array elements
 add r9, 1			; Increment main loop
 cmp r9, r11			; Compare loop index with the size
 jl @thresholdloop	; Jump less to threshold loop
-jmp @end_program
+jmp @end_program	; Jump to program end
 
 
 @end_program:
 ret
 
-ProcAsm3 endp
+AsmBinarize endp
 
 end
