@@ -185,7 +185,7 @@ namespace Aplproject
                 int progress_value = 0;
                 string statisticsCpp = "";
                 string statisticsAsm = "";
-                if (checkcpp == true)
+                if (checkasm == true)
                 {
                     double[] time_of_execution_entire_func = new double[runsNumber];
                     Stopwatch sw = new Stopwatch();
@@ -242,7 +242,7 @@ namespace Aplproject
                         }
                     }
                 }
-                if(checkasm == true)
+                if(checkcpp == true)
                 {
                     double[] time_of_execution_entire_func = new double[runsNumber];
                     Stopwatch sw2 = new Stopwatch();
